@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CustomCalendar</title>
+
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta property="og:title" content="CustomCalendar" />
+<style>
+
+html{margin:1;padding:1}
+header{position:fixed;top:0;left:0;right:0;height:70px;background:#fff;text-align: right;
+    margin: 10px;
+    color: blue;}
+body{margin:0;padding:100px 1rem 1rem;overflow:hidden;overflow:auto;font-family:sans-serif;overflow-x:hidden;overflow-y:auto}
+
+h1{position:fixed;top:10px;left:10px;}
+
+
+tr{margin:0;padding:0}
+td{width:14.28571428571429%;overflow:hidden;white-space:nowrap;}
+
+#days{margin:0;padding:0 1rem;position:fixed;top:79px;height:21px;width:100%;left:0;box-sizing:border-box}
+#days table{background:#deaded;width:100%;border-collapse:collapse;border-color:#000;border-width:1px 0;border-style:solid}
+#days td{text-align:center;border-color:#000;border-width:0 1px;border-style:solid}
+
+#calendar{margin:0;padding:0}
+#calendar table{width:100%;border-collapse:collapse;table-layout:fixed;border-bottom:1px solid #000;border-left:1px solid #000}
+#calendar td{height:20px;border-right:1px solid #000;padding:3px;}
+#calendar tr:first-child{text-align:right}
+
+.event0{border-radius:10px}
+.event1{border-radius:10px 0 0 10px}
+.event2{border-radius:0 10px 10px 0}
+
+.newmonth{float:left;font-size:0.75rem}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1 onclick="window.scrollTo(0, 0);">Calendar<span></span></h1>
+
+<div id="add" onclick="alert('show form')">+ Add Event</div>
+
+</header>
+
+<div id="days"><table><tr><td>SUN</td><td>MON</td><td>TUE</td><td>WED</td><td>THU</td><td>FRI</td><td>SAT</td></tr></table></div>
+<div id="calendar"></div>
+
+<script>
+'use strict';
+var i, $=function(n){return document.getElementById(n)};
+
+var date = 10, month = 10, year = 2019;
+var months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+var events = {
+	"2019-11-17": [
+		[0, ["Event 1", 5, "ff6655", 0]],
+		[0, 0, ["Event 2", 2, "9eb444", 0], 0, ["Event 5", 2, "e6e6e6", 1]],
+		[0, 0, 0, ["Event 3", 2, "abaaaa", 0]],
+		[0, 0, 0, ["Event 4", 1, "abcdef", 0]],
+		],
+	"2019-11-24": [
+		[["Event 3", 1, "abaaaa", 2]],
+		],
+	};
+
+var start = new Date(year, month, date);
+start = new Date(start.getTime() - start.getDay() * 86400000);
+var day = 0;
+
+function load(){
+	for(i = 0; i < 13; i++){ 
+	
+		if(day == 0){
+			//events["2019-12-21"] = [];
+			}
+
+		var week = [[]];
+
+		for(var j = 0; j < 7; j++, day++){
+			var cur = new Date(start.getTime() + day * 86400000);
+			var date = ((day == 0 || cur.getDate() == 1) ? "<span class=\"newmonth\">" + months[cur.getMonth()] + " " + cur.getFullYear() + "</span> " : "") + cur.getDate();
+			week[0].push(date);
+
+			if(j === 0){
+				var sunYMD = cur.getFullYear() + "-" + (cur.getMonth() + 1) + "-" + cur.getDate();
+				if(sunYMD in events) week = week.concat(events[sunYMD]);
+				}
+
+			}
+
+		var table = document.createElement("table");
+
+		for(var l = 0; l < Math.max(4, week.length); l++){
+			var row = table.insertRow(-1);
+
+			for(var j = 0, k = 7; j < k; j++){
+				var cell = row.insertCell(-1);
+				if(typeof week[l] === "undefined" || typeof week[l][j] === "undefined" || week[l][j] === 0){}
+				else if(Array.isArray(week[l][j])){
+					cell.innerHTML = week[l][j][0];
+					cell.classList.add("event" + week[l][j][3]);
+					cell.style.backgroundColor = "#" + week[l][j][2];
+					cell.style.height="100";
+					
+					cell.colSpan = week[l][j][1];
+					k = k - week[l][j][1] + 1;
+					}
+				else cell.innerHTML = week[l][j];
+				};
+
+			}
+		// Insert the week
+		$("calendar").insertBefore(table, null);
+		}
+	}
+
+window.onscroll = function(){
+	if((document.body.clientHeight - window.innerHeight - window.scrollY) <= 100) load();
+	}
+
+setTimeout(function(){
+	window.scrollTo(0, 0);
+	}, 100);
+
+load();
+</script>
+</body>
+</html>
